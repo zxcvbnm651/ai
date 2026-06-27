@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite'
+bimport { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
+base: '/ai/',ai    // ← 这里填你 GitHub 仓库的名字
   plugins: [vue()],
   server: {
     proxy: {
