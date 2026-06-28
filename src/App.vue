@@ -34,11 +34,9 @@ async function send() {
   typing.value = true
 
   try {
-    const res = await fetch('/api/v1/chat/completions', {
+    const res = await fetch('https://ai-psi-teal.vercel.app/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: [
@@ -62,13 +60,13 @@ async function send() {
         text: '出错了: ' + JSON.stringify(data)
       })
     }
-  } catch (error) {
+  } catch (err) {
     typing.value = false
     messages.value.push({
       role: 'ai',
       text: '网络请求失败，请检查控制台'
     })
-    console.error(error)
+    console.error(err)
   }
 }
 </script>
@@ -80,7 +78,6 @@ async function send() {
   padding: 20px;
   font-family: sans-serif;
 }
-
 .chat-box {
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -88,7 +85,6 @@ async function send() {
   min-height: 300px;
   margin-bottom: 16px;
 }
-
 .chat-box .user {
   text-align: right;
   color: #333;
@@ -97,7 +93,6 @@ async function send() {
   padding: 8px;
   border-radius: 8px;
 }
-
 .chat-box .ai {
   text-align: left;
   color: #0066cc;
@@ -106,24 +101,20 @@ async function send() {
   padding: 8px;
   border-radius: 8px;
 }
-
 .typing {
   color: #999;
   font-style: italic;
 }
-
 .input-area {
   display: flex;
   gap: 8px;
 }
-
 .input-area input {
   flex: 1;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-
 .input-area button {
   padding: 8px 16px;
   background: #0066cc;
@@ -133,4 +124,3 @@ async function send() {
   cursor: pointer;
 }
 </style>
-
