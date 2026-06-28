@@ -1,3 +1,60 @@
+<script setup>
+import { ref } from 'vue'
+
+const input = ref('')
+const messages = ref([])
+const typing = ref(false)
+
+async function send() {
+  if (!input.value.trim()) return
+
+  // 添加用户消息
+  messages.value.push({ role: 'user', text: input.value })
+  const question = input.value
+  input.value = ''
+  typing.value = true
+
+  try {
+    let res = await fetch('/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: '你是一个友好的助手' },
+          { role: 'user', content: question }
+        ]
+      })
+    })
+
+    let data = await res.json()
+    typing.value = false
+
+    // 🔥 修正点在这里：将 msg 改成了 message
+    if (data.choices && data.choices[0]) {
+      messages.value.push({
+        role: 'ai',
+        text: data.choices[0].message.content
+      })
+    } else {
+      // 如果出错，显示返回的数据方便调试
+      messages.value.push({
+        role: 'ai',
+        text: '出错了: ' + JSON.stringify(data)
+      })
+    }
+  } catch (error) {
+    typing.value = false
+    messages.value.push({
+      role: 'ai',
+      text: '网络请求失败，请检查控制台'
+    })
+    console.error(error)
+  }
+}
+</script>
 <template>
   <div class="container">
     <h1>💬 我的 AI 助手</h1>
