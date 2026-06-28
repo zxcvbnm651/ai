@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+# 触发条件：只要向 main 分支 push 代码，就自动运行
+on:
+  push:
+    branches:
+      - main
+
+# 赋予权限，这是新版 GitHub Pages 必须的
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 并发控制
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 拉取代码
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. 安装 Node.js 环境
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. 安装依赖 (npm install)
+      - name: Install dependencies
+        run: npm install
+
+      # 4. 打包项目 (npm run build), Vue 项目通常会生成 dist 文件夹
+      - name: Build project
+        run: npm run build
+
+      # 5. 上传打包好的文件 (这里改用最新的 v4 版本, 解决你的报错)
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          # 注意这里：冒号后面一定要有一个空格！
+          path: ./dist 
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 6. 部署到 GitHub Pages
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
